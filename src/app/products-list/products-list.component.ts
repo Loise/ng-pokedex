@@ -1,21 +1,23 @@
 import { Component, inject } from '@angular/core';
 import { ProductCardComponent } from '../product-card/product-card.component';
 import { SortByDate } from '../sort-by-date.pipe';
+import { SortByName } from '../sort-by-name.pipe';
 import { ProductService } from '../product.service';
 import { FormsModule } from '@angular/forms';
+import { DynamicPipe } from '../dynamic-pipe.pipe';
 
 @Component({
   selector: 'app-products-list',
-  imports: [ProductCardComponent, SortByDate, FormsModule],
+  imports: [ProductCardComponent, DynamicPipe , FormsModule],
   template: `
     <h2>{{countFav}} favorites</h2>
     <select [(ngModel)]="sortSelected">
-      @for (so of sortOpt; track so) {
-        <option [value]="$index">{{so}}</option>
+      @for (so of sortAvailable; track so.label) {
+        <option [value]="$index">{{so.label}}</option>
       } 
     </select>
-    sort selected {{sortOpt[sortSelected]}}
-    @for (p of (products | sortByDate:true); track p.id) {
+    sort selected {{sortAvailable[sortSelected].label}}
+    @for (p of (products | dynamicPipe:{pipe: sortAvailable[sortSelected].pipe, options: sortAvailable[sortSelected].opts}); track p.id) {
       <app-product-card 
         [product]=p
         (addItemEvent)="addItem($event)"
@@ -25,7 +27,28 @@ import { FormsModule } from '@angular/forms';
   styles: [],
 })
 export class ProductsListComponent {
-  sortOpt = ['A-Z', 'Z-A', '+ recent', '+ ancien'];
+  sortAvailable = [
+    {
+      label: 'A-Z',
+      pipe: SortByName,
+      opts: [true]
+    },
+    {
+      label: 'Z-A',
+      pipe: SortByName,
+      opts: [false]
+    },
+    {
+      label: '+ recent',
+      pipe: SortByDate,
+      opts: [true]
+    },
+    {
+      label: '+ ancien',
+      pipe: SortByDate,
+      opts: [false]
+    }
+  ]
   sortSelected = 0;
   countFav = 0;
   productService = inject(ProductService);
