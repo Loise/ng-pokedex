@@ -29,7 +29,7 @@ export class ProductService {
   }
 
   getProduct(id: number) {
-    return this.products[id];
+    return this.products.find((p =>p.id == id));
   }
 
   switchFav(product: Product) {

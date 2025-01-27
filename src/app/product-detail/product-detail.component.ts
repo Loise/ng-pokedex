@@ -4,11 +4,12 @@ import { ProductService } from '../product.service';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'app-product-card',
+  selector: 'app-product-detail',
   imports: [],
   template: `
     <div>
-      <h1>{{product.name}}</h1>
+    @if (product) {
+     <h1>{{product.name}}</h1>
       @if (product.isFavorite) {
         <span>
           <b>Favorite product</b>
@@ -19,12 +20,16 @@ import { ActivatedRoute } from '@angular/router';
           Simple product <button (click)="switchFav()">Do fav</button>
         </span>
       }
+    }
+    @else {
+      <p>No product here </p>
+    }
     </div>
   `,
   styles: ``
 })
 export class ProductDetailComponent {
-  product: Product = { id: 0, name: '', isFavorite: false, createdDate: new Date() };
+  product?: Product = { id: 0, name: '', isFavorite: false, createdDate: new Date() };
   @Output() addItemEvent = new EventEmitter<number>();
   productService = inject(ProductService)
 
@@ -35,7 +40,9 @@ export class ProductDetailComponent {
   }
 
   switchFav() {
-    this.productService.switchFav(this.product);
-    this.addItemEvent.emit(this.product.isFavorite ? 1 : -1);
+    if (this.product) {
+      this.productService.switchFav(this.product);
+      this.addItemEvent.emit(this.product.isFavorite ? 1 : -1);
+    }
   }
 }
