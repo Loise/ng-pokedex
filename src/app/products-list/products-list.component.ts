@@ -1,10 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ProductCardComponent } from '../product-card/product-card.component';
 import { SortByDate } from '../sort-by-date.pipe';
 import { SortByName } from '../sort-by-name.pipe';
 import { ProductService } from '../product.service';
 import { FormsModule } from '@angular/forms';
 import { DynamicPipe } from '../dynamic-pipe.pipe';
+import { Product } from '../product';
 
 @Component({
   selector: 'app-products-list',
@@ -26,7 +27,7 @@ import { DynamicPipe } from '../dynamic-pipe.pipe';
   `,
   styles: [],
 })
-export class ProductsListComponent {
+export class ProductsListComponent implements OnInit{
   sortAvailable = [
     {
       label: 'A-Z',
@@ -52,7 +53,13 @@ export class ProductsListComponent {
   sortSelected = 0;
   countFav = 0;
   productService = inject(ProductService);
-  products = this.productService.getProducts();
+  products: Product[] = [];
+
+  ngOnInit(): void {
+    this.productService.getProducts().subscribe(
+      products => {this.products = products}
+    )
+  }
 
   addItem(item: number) {
     this.countFav += item;
